@@ -1,10 +1,12 @@
-function move_backward () {
-	
+function move_backward() {
+    
 }
-function move_forward () {
-	
+
+function move_forward() {
+    
 }
+
 joystickbit.initJoystickBit()
-basic.forever(function () {
-	
+basic.forever(function on_forever() {
+    
 })
