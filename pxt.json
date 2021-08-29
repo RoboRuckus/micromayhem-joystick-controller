@@ -4,7 +4,8 @@
     "dependencies": {
         "core": "*",
         "radio": "*",
-        "microphone": "*"
+        "microphone": "*",
+        "joystickbit": "github:tinkertanker/pxt-joystickbit#v1.0.1"
     },
     "files": [
         "main.blocks",
