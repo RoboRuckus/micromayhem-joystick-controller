@@ -10,9 +10,9 @@ def setup():
   radio.on_received_value(receive_message)
   joystickbit.init_joystick_bit()
   joystickbit.on_button_event(joystickbit.JoystickBitPin.P12, joystickbit.ButtonType.DOWN, turn_left_90)
-  joystickbit.on_button_event(joystickbit.JoystickBitPin.P13, joystickbit.ButtonType.DOWN, turn_right_90)
-  joystickbit.on_button_event(joystickbit.JoystickBitPin.P14, joystickbit.ButtonType.DOWN, move_forward)
-  joystickbit.on_button_event(joystickbit.JoystickBitPin.P15, joystickbit.ButtonType.DOWN, move_backward)
+  joystickbit.on_button_event(joystickbit.JoystickBitPin.P13, joystickbit.ButtonType.DOWN, move_forward)
+  joystickbit.on_button_event(joystickbit.JoystickBitPin.P14, joystickbit.ButtonType.DOWN, move_backward)
+  joystickbit.on_button_event(joystickbit.JoystickBitPin.P15, joystickbit.ButtonType.DOWN, turn_right_90)
   basic.clear_screen()
 
 # def calibrate():
@@ -67,22 +67,28 @@ def show_moving(value):
                     """)
 
 def move_forward():
-  basic.show_icon(IconNames.DIAMOND)
+  basic.show_icon(IconNames.TRIANGLE)
   send_message('move', FORWARD)
   basic.clear_screen()
 
 def move_backward():
-  basic.show_icon(IconNames.DIAMOND)
+  basic.show_icon(IconNames.NO)
   send_message('move', BACKWARD)
   basic.clear_screen()
 
 def turn_right_90():
-  basic.show_icon(IconNames.DIAMOND)
+  basic.show_leds("""
+                  . # # # .
+                  # . . . #
+                  # . . . #
+                  # . . . #
+                  . # # # .
+                  """)
   send_message('turn', RIGHT)
   basic.clear_screen()
 
 def turn_left_90():
-  basic.show_icon(IconNames.DIAMOND)
+  basic.show_icon(IconNames.SQUARE)
   send_message('turn', LEFT)
   basic.clear_screen()
 

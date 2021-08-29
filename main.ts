@@ -18,23 +18,29 @@ function setup() {
     })
     joystickbit.initJoystickBit()
     joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P12, joystickbit.ButtonType.down, function turn_left_90() {
-        basic.showIcon(IconNames.Diamond)
+        basic.showIcon(IconNames.Square)
         send_message("turn", LEFT)
         basic.clearScreen()
     })
-    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P13, joystickbit.ButtonType.down, function turn_right_90() {
-        basic.showIcon(IconNames.Diamond)
-        send_message("turn", RIGHT)
-        basic.clearScreen()
-    })
-    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P14, joystickbit.ButtonType.down, function move_forward() {
-        basic.showIcon(IconNames.Diamond)
+    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P13, joystickbit.ButtonType.down, function move_forward() {
+        basic.showIcon(IconNames.Triangle)
         send_message("move", FORWARD)
         basic.clearScreen()
     })
-    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P15, joystickbit.ButtonType.down, function move_backward() {
-        basic.showIcon(IconNames.Diamond)
+    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P14, joystickbit.ButtonType.down, function move_backward() {
+        basic.showIcon(IconNames.No)
         send_message("move", BACKWARD)
+        basic.clearScreen()
+    })
+    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P15, joystickbit.ButtonType.down, function turn_right_90() {
+        basic.showLeds(`
+                  . # # # .
+                  # . . . #
+                  # . . . #
+                  # . . . #
+                  . # # # .
+                  `)
+        send_message("turn", RIGHT)
         basic.clearScreen()
     })
     basic.clearScreen()
