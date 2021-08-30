@@ -178,30 +178,34 @@ def send_direction():
         send_message('turn', 0)
 
 def move_forward():
-  basic.show_icon(IconNames.TRIANGLE)
-  send_message('move', FORWARD)
-  basic.clear_screen()
+    if not MANUAL_CONTROL:
+        basic.show_icon(IconNames.TRIANGLE)
+        send_message('move', FORWARD)
+        basic.clear_screen()
 
 def move_backward():
-  basic.show_icon(IconNames.NO)
-  send_message('move', BACKWARD)
-  basic.clear_screen()
+    if not MANUAL_CONTROL:
+        basic.show_icon(IconNames.NO)
+        send_message('move', BACKWARD)
+        basic.clear_screen()
 
 def turn_right_90():
-  basic.show_leds("""
-                  . # # # .
-                  # . . . #
-                  # . . . #
-                  # . . . #
-                  . # # # .
-                  """)
-  send_message('turn', RIGHT)
-  basic.clear_screen()
+    if not MANUAL_CONTROL:
+        basic.show_leds("""
+                        . # # # .
+                        # . . . #
+                        # . . . #
+                        # . . . #
+                        . # # # .
+                        """)
+        send_message('turn', RIGHT)
+        basic.clear_screen()
 
 def turn_left_90():
-  basic.show_icon(IconNames.SQUARE)
-  send_message('turn', LEFT)
-  basic.clear_screen()
+    if not MANUAL_CONTROL:
+        basic.show_icon(IconNames.SQUARE)
+        send_message('turn', LEFT)
+        basic.clear_screen()
 
 def toggle_joystick():
   global MANUAL_CONTROL
