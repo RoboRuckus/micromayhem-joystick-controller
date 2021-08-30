@@ -24,6 +24,7 @@ function setup() {
     input.onButtonPressed(Button.B, function toggle_joystick() {
         
         MANUAL_CONTROL = !MANUAL_CONTROL
+        joystick_stop()
         basic.clearScreen()
     })
     joystickbit.initJoystickBit()
@@ -214,17 +215,22 @@ function send_direction() {
     let straight = -joystick_y()
     let turn = joystick_x()
     if (Math.abs(straight) > JOYSTICK_DEADZONE) {
-        send_message("straight", straight)
+        send_message("joystick_straight", straight)
     } else {
-        send_message("straight", 0)
+        send_message("joystick_straight", 0)
     }
     
     if (Math.abs(turn) > JOYSTICK_DEADZONE) {
-        send_message("turn", turn)
+        send_message("joystick_turn", turn)
     } else {
-        send_message("turn", 0)
+        send_message("joystick_turn", 0)
     }
     
+}
+
+function joystick_stop() {
+    send_message("joystick_straight", 0)
+    send_message("joystick_move", 0)
 }
 
 setup()

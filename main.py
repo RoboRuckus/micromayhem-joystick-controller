@@ -169,13 +169,17 @@ def send_direction():
     straight = -joystick_y()
     turn = joystick_x()
     if abs(straight) > JOYSTICK_DEADZONE:
-        send_message('straight', straight)
+        send_message('joystick_straight', straight)
     else:
-        send_message('straight', 0)
+        send_message('joystick_straight', 0)
     if abs(turn) > JOYSTICK_DEADZONE:
-        send_message('turn', turn)
+        send_message('joystick_turn', turn)
     else:
-        send_message('turn', 0)
+        send_message('joystick_turn', 0)
+
+def joystick_stop():
+    send_message('joystick_straight', 0)
+    send_message('joystick_move', 0)
 
 def move_forward():
     if not MANUAL_CONTROL:
@@ -208,9 +212,10 @@ def turn_left_90():
         basic.clear_screen()
 
 def toggle_joystick():
-  global MANUAL_CONTROL
-  MANUAL_CONTROL = not MANUAL_CONTROL
-  basic.clear_screen()
+    global MANUAL_CONTROL
+    MANUAL_CONTROL = not MANUAL_CONTROL
+    joystick_stop()
+    basic.clear_screen()
 
 setup()
 basic.forever(loop)
