@@ -1,243 +1,223 @@
-//  Which radio group to transmit to, will need to vary this between bots
-let RADIO_GROUP = 90
-//  We can only transmit numbers via send_value, create ENUM
-let LEFT = 0
-let RIGHT = 1
-let FORWARD = 0
-let BACKWARD = 1
-//  Joystick Related
-let JOYSTICK_DEADZONE = 20
-let MANUAL_CONTROL = false
-function setup() {
-    basic.showIcon(IconNames.Heart)
-    radio.setGroup(RADIO_GROUP)
-    radio.onReceivedValue(function receive_message(key: string, value: number) {
-        if (key == "turning") {
-            show_turning(value)
-        } else if (key == "moving") {
-            show_moving(value)
-        } else if (key == "done") {
-            basic.clearScreen()
-        }
-        
-    })
-    input.onButtonPressed(Button.B, function toggle_joystick() {
-        
-        MANUAL_CONTROL = !MANUAL_CONTROL
-        joystick_stop()
-        basic.clearScreen()
-    })
-    joystickbit.initJoystickBit()
-    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P12, joystickbit.ButtonType.down, function turn_left_90() {
-        if (!MANUAL_CONTROL) {
-            basic.showIcon(IconNames.Square)
-            send_message("turn", LEFT)
-            basic.clearScreen()
-        }
-        
-    })
-    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P13, joystickbit.ButtonType.down, function move_forward() {
-        if (!MANUAL_CONTROL) {
-            basic.showIcon(IconNames.Triangle)
-            send_message("move", FORWARD)
-            basic.clearScreen()
-        }
-        
-    })
-    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P14, joystickbit.ButtonType.down, function move_backward() {
-        if (!MANUAL_CONTROL) {
-            basic.showIcon(IconNames.No)
-            send_message("move", BACKWARD)
-            basic.clearScreen()
-        }
-        
-    })
-    joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P15, joystickbit.ButtonType.down, function turn_right_90() {
-        if (!MANUAL_CONTROL) {
-            basic.showLeds(`
-                        . # # # .
-                        # . . . #
-                        # . . . #
-                        # . . . #
-                        . # # # .
-                        `)
-            send_message("turn", RIGHT)
-            basic.clearScreen()
-        }
-        
-    })
-    basic.clearScreen()
+function showStick() {
+    basic.showLeds(`
+        . # # # .
+        # # # # #
+        . # # # .
+        . . # . .
+        . . # . .
+    `)
 }
 
-//  def calibrate():
-function joystick_x(): number {
-    //  return input.acceleration(Dimension.X)
-    return -(joystickbit.getRockerValue(joystickbit.rockerType.X) - 500)
-}
-
-function joystick_y() {
-    //  return input.acceleration(Dimension.Y)
-    return -(joystickbit.getRockerValue(joystickbit.rockerType.Y) - 500)
-}
-
-function send_message(key: string, value: number) {
-    radio.sendValue(key, value)
-}
-
-function show_turning(value: number) {
-    if (value == LEFT) {
+function incramental() {
+    
+    setVarsToPins()
+    if (forwardButton == 0) {
+        radio.sendString("slowForward")
         basic.showLeds(`
-                    . . # . .
-                    . # . . .
-                    # # # # #
-                    . # . . .
-                    . . # . .
-                    `)
-    } else if (value == RIGHT) {
+            . . # . .
+            . # . # .
+            # . . . #
+            . . . . .
+            . . . . .
+        `)
+        basic.pause(100)
+        forwardButton = 1
+    } else if (backwardButton == 0) {
+        radio.sendString("slowBackward")
+        backwardButton = 1
         basic.showLeds(`
-                    . . # . .
-                    . . . # .
-                    # # # # #
-                    . . . # .
-                    . . # . .
-                    `)
+            . . . . .
+            . . . . .
+            # . . . #
+            . # . # .
+            . . # . .
+        `)
+        basic.pause(100)
+    } else if (rightButton == 0) {
+        radio.sendString("oneDegreeRight")
+        rightButton = 1
+        basic.showLeds(`
+            . . # . .
+            . . . # .
+            . . . . #
+            . . . # .
+            . . # . .
+        `)
+        basic.pause(100)
+    } else if (leftButton == 0) {
+        radio.sendString("oneDegreeLeft")
+        leftButton = 1
+        basic.showLeds(`
+            . . # . .
+            . # . . .
+            # . . . .
+            . # . . .
+            . . # . .
+        `)
+        basic.pause(100)
+    } else {
+        sendStop()
     }
     
 }
 
-function show_moving(value: number) {
-    if (value == FORWARD) {
+function stickCheck() {
+    if (pins.analogReadPin(AnalogPin.P2) > 550 && (pins.analogReadPin(AnalogPin.P1) > 400 && pins.analogReadPin(AnalogPin.P1) < 600)) {
+        radio.sendValue("F", pins.analogReadPin(AnalogPin.P2))
         basic.showLeds(`
-                    . . # . .
-                    . # # # .
-                    # . # . #
-                    . . # . .
-                    . . # . .
-                    `)
-    } else if (value == BACKWARD) {
+            . . # . .
+            . # . # .
+            # . # . #
+            . . . . .
+            . . # . .
+        `)
+    } else if (pins.analogReadPin(AnalogPin.P2) < 450 && (pins.analogReadPin(AnalogPin.P1) > 400 && pins.analogReadPin(AnalogPin.P1) < 600)) {
+        radio.sendValue("B", pins.analogReadPin(AnalogPin.P2))
         basic.showLeds(`
-                    . . # . .
-                    . . # . .
-                    # . # . #
-                    . # # # .
-                    . . # . .
-                    `)
+            . . # . .
+            . . . . .
+            # . # . #
+            . # . # .
+            . . # . .
+        `)
+    } else if (pins.analogReadPin(AnalogPin.P1) < 450 && (pins.analogReadPin(AnalogPin.P2) > 400 && pins.analogReadPin(AnalogPin.P2) < 600)) {
+        radio.sendValue("L", pins.analogReadPin(AnalogPin.P1))
+        basic.showLeds(`
+            . . # . .
+            . # . . .
+            # . # . #
+            . # . . .
+            . . # . .
+        `)
+    } else if (pins.analogReadPin(AnalogPin.P1) > 550 && (pins.analogReadPin(AnalogPin.P2) > 400 && pins.analogReadPin(AnalogPin.P2) < 600)) {
+        radio.sendValue("R", pins.analogReadPin(AnalogPin.P1))
+        basic.showLeds(`
+            . . # . .
+            . . . # .
+            # . # . #
+            . . . # .
+            . . # . .
+        `)
+    } else {
+        sendStop()
     }
     
 }
 
-function direction_arrow() {
-    let straight = -joystick_y()
-    let turn = joystick_x()
-    if (straight > JOYSTICK_DEADZONE) {
-        if (turn > JOYSTICK_DEADZONE) {
-            basic.showLeds(`
-                            . # # # #
-                            . . . # #
-                            . . # . #
-                            . # . . #
-                            # . . . .
-                            `)
-        } else if (turn < -JOYSTICK_DEADZONE) {
-            basic.showLeds(`
-                            # # # # .
-                            # # . . .
-                            # . # . .
-                            # . . # .
-                            . . . . #
-                            `)
+function sendStop() {
+    radio.sendString("S")
+}
+
+function setVarsToPins() {
+    
+    forwardButton = pins.digitalReadPin(DigitalPin.P15)
+    backwardButton = pins.digitalReadPin(DigitalPin.P13)
+    rightButton = pins.digitalReadPin(DigitalPin.P14)
+    leftButton = pins.digitalReadPin(DigitalPin.P16)
+}
+
+function showButtons() {
+    basic.showLeds(`
+        . # # # .
+        # . # . #
+        # # . # #
+        # . # . #
+        . # # # .
+    `)
+}
+
+function setPins() {
+    pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
+    pins.setPull(DigitalPin.P13, PinPullMode.PullUp)
+    pins.setPull(DigitalPin.P14, PinPullMode.PullUp)
+    pins.setPull(DigitalPin.P16, PinPullMode.PullUp)
+}
+
+function loop() {
+    
+    if (input.buttonIsPressed(Button.A)) {
+        if (stickControl) {
+            stickControl = false
         } else {
-            basic.showLeds(`
-                            . . # . .
-                            . # # # .
-                            # . # . #
-                            . . # . .
-                            . . # . .
-                            `)
+            stickControl = true
         }
         
-    } else if (straight < -JOYSTICK_DEADZONE) {
-        if (turn > JOYSTICK_DEADZONE) {
-            basic.showLeds(`
-                            # . . . .
-                            . # . . #
-                            . . # . #
-                            . . . # #
-                            . # # # #
-                            `)
-        } else if (turn < -JOYSTICK_DEADZONE) {
-            basic.showLeds(`
-                            . . . . #
-                            # . . # .
-                            # . # . .
-                            # # . . .
-                            # # # # .
-                            `)
-        } else {
-            basic.showLeds(`
-                            . . # . .
-                            . . # . .
-                            # . # . #
-                            . # # # .
-                            . . # . .
-                            `)
-        }
-        
-    } else if (turn > JOYSTICK_DEADZONE) {
-        basic.showLeds(`
-                            . . # . .
-                            . . . # .
-                            # # # # #
-                            . . . # .
-                            . . # . .
-                            `)
-    } else if (turn < -JOYSTICK_DEADZONE) {
-        basic.showLeds(`
-                            . . # . .
-                            . # . . .
-                            # # # # #
-                            . # . . .
-                            . . # . .
-                            `)
+    }
+    
+    if (stickControl) {
+        showStick()
+        stickCheck()
+    } else if (input.buttonIsPressed(Button.B)) {
+        showButtons()
+        incramental()
     } else {
-        basic.showLeds(`
-                            . # # # .
-                            # . . . #
-                            # . . . #
-                            # . . . #
-                            . # # # .
-                            `)
+        showButtons()
+        buttonCheck()
     }
     
 }
 
-function send_direction() {
-    let straight = -joystick_y()
-    let turn = joystick_x()
-    if (Math.abs(straight) > JOYSTICK_DEADZONE) {
-        send_message("joystick_straight", straight)
-    } else {
-        send_message("joystick_straight", 0)
-    }
+function buttonCheck() {
     
-    if (Math.abs(turn) > JOYSTICK_DEADZONE) {
-        send_message("joystick_turn", turn)
+    setVarsToPins()
+    if (forwardButton == 0) {
+        radio.sendString("FA")
+        forwardButton = 1
+        basic.showLeds(`
+            . . # . .
+            . # # # .
+            # . # . #
+            . . # . .
+            . . # . .
+        `)
+        basic.pause(100)
+    } else if (backwardButton == 0) {
+        radio.sendString("BA")
+        backwardButton = 1
+        basic.showLeds(`
+            . . # . .
+            . . # . .
+            # . # . #
+            . # # # .
+            . . # . .
+        `)
+        basic.pause(100)
+    } else if (rightButton == 0) {
+        radio.sendString("RA")
+        rightButton = 1
+        basic.showLeds(`
+            . . # . .
+            . . . # .
+            # # # # #
+            . . . # .
+            . . # . .
+        `)
+        basic.pause(100)
+    } else if (leftButton == 0) {
+        radio.sendString("LA")
+        leftButton = 1
+        basic.showLeds(`
+            . . # . .
+            . # . . .
+            # # # # #
+            . # . . .
+            . . # . .
+        `)
+        basic.pause(100)
     } else {
-        send_message("joystick_turn", 0)
+        sendStop()
     }
     
 }
 
-function joystick_stop() {
-    send_message("joystick_straight", 0)
-    send_message("joystick_move", 0)
-}
-
-setup()
-basic.forever(function loop() {
-    if (MANUAL_CONTROL == true) {
-        direction_arrow()
-        send_direction()
-    }
-    
+let leftButton = 0
+let rightButton = 0
+let backwardButton = 0
+let forwardButton = 0
+let stickControl = false
+radio.setGroup(1)
+stickControl = false
+setPins()
+basic.forever(function on_forever() {
+    loop()
 })

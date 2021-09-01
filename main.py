@@ -1,221 +1,194 @@
-# Which radio group to transmit to, will need to vary this between bots
-RADIO_GROUP = 90
-
-# We can only transmit numbers via send_value, create ENUM
-LEFT = 0
-RIGHT = 1
-
-FORWARD = 0
-BACKWARD = 1
-
-# Joystick Related
-JOYSTICK_DEADZONE = 20
-MANUAL_CONTROL = False
-
-def setup():
-  basic.show_icon(IconNames.HEART)
-  radio.set_group(RADIO_GROUP)
-  radio.on_received_value(receive_message)
-  input.on_button_pressed(Button.B, toggle_joystick)
-  joystickbit.init_joystick_bit()
-  joystickbit.on_button_event(joystickbit.JoystickBitPin.P12, joystickbit.ButtonType.DOWN, turn_left_90)
-  joystickbit.on_button_event(joystickbit.JoystickBitPin.P13, joystickbit.ButtonType.DOWN, move_forward)
-  joystickbit.on_button_event(joystickbit.JoystickBitPin.P14, joystickbit.ButtonType.DOWN, move_backward)
-  joystickbit.on_button_event(joystickbit.JoystickBitPin.P15, joystickbit.ButtonType.DOWN, turn_right_90)
-  basic.clear_screen()
-
-# def calibrate():
-
-def loop():
-  if MANUAL_CONTROL == True:
-    direction_arrow()
-    send_direction()
-
-def joystick_x():
-    # return input.acceleration(Dimension.X)
-    return -(joystickbit.get_rocker_value(joystickbit.rockerType.X) - 500)
-
-def joystick_y():
-    # return input.acceleration(Dimension.Y)
-    return -(joystickbit.get_rocker_value(joystickbit.rockerType.Y) - 500)
-
-def send_message(key, value):
-  radio.send_value(key, value)
-
-def receive_message(key, value):
-  if key == 'turning':
-    show_turning(value)
-  elif key == 'moving':
-    show_moving(value)
-  elif key == 'done':
-    basic.clear_screen()
-
-def show_turning(value):
-  if value == LEFT:
+def showStick():
     basic.show_leds("""
-                    . . # . .
-                    . # . . .
-                    # # # # #
-                    . # . . .
-                    . . # . .
-                    """)
-  elif value == RIGHT:
-    basic.show_leds("""
-                    . . # . .
-                    . . . # .
-                    # # # # #
-                    . . . # .
-                    . . # . .
-                    """)
-
-def show_moving(value):
-  if value == FORWARD:
-    basic.show_leds("""
-                    . . # . .
-                    . # # # .
-                    # . # . #
-                    . . # . .
-                    . . # . .
-                    """)
-  elif value == BACKWARD:
-    basic.show_leds("""
-                    . . # . .
-                    . . # . .
-                    # . # . #
-                    . # # # .
-                    . . # . .
-                    """)
-
-def direction_arrow():
-    straight = -joystick_y()
-    turn = joystick_x()
-    if straight > JOYSTICK_DEADZONE:
-        if turn > JOYSTICK_DEADZONE:
-            basic.show_leds("""
-                            . # # # #
-                            . . . # #
-                            . . # . #
-                            . # . . #
-                            # . . . .
-                            """)
-        elif turn < -JOYSTICK_DEADZONE:
-            basic.show_leds("""
-                            # # # # .
-                            # # . . .
-                            # . # . .
-                            # . . # .
-                            . . . . #
-                            """)
-        else:
-            basic.show_leds("""
-                            . . # . .
-                            . # # # .
-                            # . # . #
-                            . . # . .
-                            . . # . .
-                            """)
-    elif straight < -JOYSTICK_DEADZONE:
-        if turn > JOYSTICK_DEADZONE:
-            basic.show_leds("""
-                            # . . . .
-                            . # . . #
-                            . . # . #
-                            . . . # #
-                            . # # # #
-                            """)
-        elif turn < -JOYSTICK_DEADZONE:
-            basic.show_leds("""
-                            . . . . #
-                            # . . # .
-                            # . # . .
-                            # # . . .
-                            # # # # .
-                            """)
-        else:
-            basic.show_leds("""
-                            . . # . .
-                            . . # . .
-                            # . # . #
-                            . # # # .
-                            . . # . .
-                            """)
-    else:
-        if turn > JOYSTICK_DEADZONE:
-            basic.show_leds("""
-                            . . # . .
-                            . . . # .
-                            # # # # #
-                            . . . # .
-                            . . # . .
-                            """)
-        elif turn < -JOYSTICK_DEADZONE:
-            basic.show_leds("""
-                            . . # . .
-                            . # . . .
-                            # # # # #
-                            . # . . .
-                            . . # . .
-                            """)
-        else:
-            basic.show_leds("""
-                            . # # # .
-                            # . . . #
-                            # . . . #
-                            # . . . #
-                            . # # # .
-                            """)
-
-def send_direction():
-    straight = -joystick_y()
-    turn = joystick_x()
-    if abs(straight) > JOYSTICK_DEADZONE:
-        send_message('joystick_straight', straight)
-    else:
-        send_message('joystick_straight', 0)
-    if abs(turn) > JOYSTICK_DEADZONE:
-        send_message('joystick_turn', turn)
-    else:
-        send_message('joystick_turn', 0)
-
-def joystick_stop():
-    send_message('joystick_straight', 0)
-    send_message('joystick_move', 0)
-
-def move_forward():
-    if not MANUAL_CONTROL:
-        basic.show_icon(IconNames.TRIANGLE)
-        send_message('move', FORWARD)
-        basic.clear_screen()
-
-def move_backward():
-    if not MANUAL_CONTROL:
-        basic.show_icon(IconNames.NO)
-        send_message('move', BACKWARD)
-        basic.clear_screen()
-
-def turn_right_90():
-    if not MANUAL_CONTROL:
+        . # # # .
+        # # # # #
+        . # # # .
+        . . # . .
+        . . # . .
+    """)
+def incramental():
+    global forwardButton, backwardButton, rightButton, leftButton
+    setVarsToPins()
+    if forwardButton == 0:
+        radio.send_string("slowForward")
         basic.show_leds("""
-                        . # # # .
-                        # . . . #
-                        # . . . #
-                        # . . . #
-                        . # # # .
-                        """)
-        send_message('turn', RIGHT)
-        basic.clear_screen()
+            . . # . .
+            . # . # .
+            # . . . #
+            . . . . .
+            . . . . .
+        """)
+        basic.pause(100)
+        forwardButton = 1
+    elif backwardButton == 0:
+        radio.send_string("slowBackward")
+        backwardButton = 1
+        basic.show_leds("""
+            . . . . .
+            . . . . .
+            # . . . #
+            . # . # .
+            . . # . .
+        """)
+        basic.pause(100)
+    elif rightButton == 0:
+        radio.send_string("oneDegreeRight")
+        rightButton = 1
+        basic.show_leds("""
+            . . # . .
+            . . . # .
+            . . . . #
+            . . . # .
+            . . # . .
+        """)
+        basic.pause(100)
+    elif leftButton == 0:
+        radio.send_string("oneDegreeLeft")
+        leftButton = 1
+        basic.show_leds("""
+            . . # . .
+            . # . . .
+            # . . . .
+            . # . . .
+            . . # . .
+        """)
+        basic.pause(100)
+    else:
+        sendStop()
+def stickCheck():
+    if pins.analog_read_pin(AnalogPin.P2) > 550 and (pins.analog_read_pin(AnalogPin.P1) > 400 and pins.analog_read_pin(AnalogPin.P1) < 600):
+        radio.send_value("F", pins.analog_read_pin(AnalogPin.P2))
+        basic.show_leds("""
+            . . # . .
+            . # . # .
+            # . # . #
+            . . . . .
+            . . # . .
+        """)
+    elif pins.analog_read_pin(AnalogPin.P2) < 450 and (pins.analog_read_pin(AnalogPin.P1) > 400 and pins.analog_read_pin(AnalogPin.P1) < 600):
+        radio.send_value("B", pins.analog_read_pin(AnalogPin.P2))
+        basic.show_leds("""
+            . . # . .
+            . . . . .
+            # . # . #
+            . # . # .
+            . . # . .
+        """)
+    elif pins.analog_read_pin(AnalogPin.P1) < 450 and (pins.analog_read_pin(AnalogPin.P2) > 400 and pins.analog_read_pin(AnalogPin.P2) < 600):
+        radio.send_value("L", pins.analog_read_pin(AnalogPin.P1))
+        basic.show_leds("""
+            . . # . .
+            . # . . .
+            # . # . #
+            . # . . .
+            . . # . .
+        """)
+    elif pins.analog_read_pin(AnalogPin.P1) > 550 and (pins.analog_read_pin(AnalogPin.P2) > 400 and pins.analog_read_pin(AnalogPin.P2) < 600):
+        radio.send_value("R", pins.analog_read_pin(AnalogPin.P1))
+        basic.show_leds("""
+            . . # . .
+            . . . # .
+            # . # . #
+            . . . # .
+            . . # . .
+        """)
+    else:
+        sendStop()
+def sendStop():
+    radio.send_string("S")
+def setVarsToPins():
+    global forwardButton, backwardButton, rightButton, leftButton
+    forwardButton = pins.digital_read_pin(DigitalPin.P15)
+    backwardButton = pins.digital_read_pin(DigitalPin.P13)
+    rightButton = pins.digital_read_pin(DigitalPin.P14)
+    leftButton = pins.digital_read_pin(DigitalPin.P16)
+def showButtons():
+    basic.show_leds("""
+        . # # # .
+        # . # . #
+        # # . # #
+        # . # . #
+        . # # # .
+    """)
+def setPins():
+    pins.set_pull(DigitalPin.P15, PinPullMode.PULL_UP)
+    pins.set_pull(DigitalPin.P13, PinPullMode.PULL_UP)
+    pins.set_pull(DigitalPin.P14, PinPullMode.PULL_UP)
+    pins.set_pull(DigitalPin.P16, PinPullMode.PULL_UP)
+def loop():
+    global stickControl
+    if input.button_is_pressed(Button.A):
+        if stickControl:
+            stickControl = False
+        else:
+            stickControl = True
+    if stickControl:
+        showStick()
+        stickCheck()
+    elif input.button_is_pressed(Button.B):
+        showButtons()
+        incramental()
+    else:
+        showButtons()
+        buttonCheck()
+def buttonCheck():
+    global forwardButton, backwardButton, rightButton, leftButton
+    setVarsToPins()
+    if forwardButton == 0:
+        radio.send_string("FA")
+        forwardButton = 1
+        basic.show_leds("""
+            . . # . .
+            . # # # .
+            # . # . #
+            . . # . .
+            . . # . .
+        """)
+        basic.pause(100)
+    elif backwardButton == 0:
+        radio.send_string("BA")
+        backwardButton = 1
+        basic.show_leds("""
+            . . # . .
+            . . # . .
+            # . # . #
+            . # # # .
+            . . # . .
+        """)
+        basic.pause(100)
+    elif rightButton == 0:
+        radio.send_string("RA")
+        rightButton = 1
+        basic.show_leds("""
+            . . # . .
+            . . . # .
+            # # # # #
+            . . . # .
+            . . # . .
+        """)
+        basic.pause(100)
+    elif leftButton == 0:
+        radio.send_string("LA")
+        leftButton = 1
+        basic.show_leds("""
+            . . # . .
+            . # . . .
+            # # # # #
+            . # . . .
+            . . # . .
+        """)
+        basic.pause(100)
+    else:
+        sendStop()
+leftButton = 0
+rightButton = 0
+backwardButton = 0
+forwardButton = 0
+stickControl = False
+radio.set_group(1)
+stickControl = False
+setPins()
 
-def turn_left_90():
-    if not MANUAL_CONTROL:
-        basic.show_icon(IconNames.SQUARE)
-        send_message('turn', LEFT)
-        basic.clear_screen()
-
-def toggle_joystick():
-    global MANUAL_CONTROL
-    MANUAL_CONTROL = not MANUAL_CONTROL
-    joystick_stop()
-    basic.clear_screen()
-
-setup()
-basic.forever(loop)
+def on_forever():
+    loop()
+basic.forever(on_forever)
