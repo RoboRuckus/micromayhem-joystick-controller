@@ -10,7 +10,7 @@ def incramental():
     global forwardButton, backwardButton, rightButton, leftButton
     setVarsToPins()
     if forwardButton == 0:
-        radio.send_string("slowForward")
+        radio.send_string("littleForward")
         basic.show_leds("""
             . . # . .
             . # . # .
@@ -21,7 +21,7 @@ def incramental():
         basic.pause(100)
         forwardButton = 1
     elif backwardButton == 0:
-        radio.send_string("slowBackward")
+        radio.send_string("littleBackward")
         backwardButton = 1
         basic.show_leds("""
             . . . . .
@@ -32,7 +32,7 @@ def incramental():
         """)
         basic.pause(100)
     elif rightButton == 0:
-        radio.send_string("oneDegreeRight")
+        radio.send_string("littleRight")
         rightButton = 1
         basic.show_leds("""
             . . # . .
@@ -43,7 +43,7 @@ def incramental():
         """)
         basic.pause(100)
     elif leftButton == 0:
-        radio.send_string("oneDegreeLeft")
+        radio.send_string("littleLeft")
         leftButton = 1
         basic.show_leds("""
             . . # . .
@@ -57,7 +57,7 @@ def incramental():
         sendStop()
 def stickCheck():
     if pins.analog_read_pin(AnalogPin.P2) > 550 and (pins.analog_read_pin(AnalogPin.P1) > 400 and pins.analog_read_pin(AnalogPin.P1) < 600):
-        radio.send_value("F", pins.analog_read_pin(AnalogPin.P2))
+        radio.send_value("forward", pins.analog_read_pin(AnalogPin.P2))
         basic.show_leds("""
             . . # . .
             . # . # .
@@ -66,7 +66,7 @@ def stickCheck():
             . . # . .
         """)
     elif pins.analog_read_pin(AnalogPin.P2) < 450 and (pins.analog_read_pin(AnalogPin.P1) > 400 and pins.analog_read_pin(AnalogPin.P1) < 600):
-        radio.send_value("B", pins.analog_read_pin(AnalogPin.P2))
+        radio.send_value("backward", pins.analog_read_pin(AnalogPin.P2))
         basic.show_leds("""
             . . # . .
             . . . . .
@@ -75,7 +75,7 @@ def stickCheck():
             . . # . .
         """)
     elif pins.analog_read_pin(AnalogPin.P1) < 450 and (pins.analog_read_pin(AnalogPin.P2) > 400 and pins.analog_read_pin(AnalogPin.P2) < 600):
-        radio.send_value("L", pins.analog_read_pin(AnalogPin.P1))
+        radio.send_value("left", pins.analog_read_pin(AnalogPin.P1))
         basic.show_leds("""
             . . # . .
             . # . . .
@@ -84,7 +84,7 @@ def stickCheck():
             . . # . .
         """)
     elif pins.analog_read_pin(AnalogPin.P1) > 550 and (pins.analog_read_pin(AnalogPin.P2) > 400 and pins.analog_read_pin(AnalogPin.P2) < 600):
-        radio.send_value("R", pins.analog_read_pin(AnalogPin.P1))
+        radio.send_value("right", pins.analog_read_pin(AnalogPin.P1))
         basic.show_leds("""
             . . # . .
             . . . # .
@@ -135,7 +135,7 @@ def buttonCheck():
     global forwardButton, backwardButton, rightButton, leftButton
     setVarsToPins()
     if forwardButton == 0:
-        radio.send_string("FA")
+        radio.send_string("oneForward")
         forwardButton = 1
         basic.show_leds("""
             . . # . .
@@ -146,7 +146,7 @@ def buttonCheck():
         """)
         basic.pause(100)
     elif backwardButton == 0:
-        radio.send_string("BA")
+        radio.send_string("oneBackward")
         backwardButton = 1
         basic.show_leds("""
             . . # . .
@@ -157,7 +157,7 @@ def buttonCheck():
         """)
         basic.pause(100)
     elif rightButton == 0:
-        radio.send_string("RA")
+        radio.send_string("oneRight")
         rightButton = 1
         basic.show_leds("""
             . . # . .
@@ -168,7 +168,7 @@ def buttonCheck():
         """)
         basic.pause(100)
     elif leftButton == 0:
-        radio.send_string("LA")
+        radio.send_string("oneLeft")
         leftButton = 1
         basic.show_leds("""
             . . # . .
