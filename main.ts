@@ -1,223 +1,211 @@
-function showStick() {
+function showStick () {
     basic.showLeds(`
         . # # # .
         # # # # #
         . # # # .
         . . # . .
         . . # . .
-    `)
+        `)
 }
-
-function incramental() {
-    
+function stickCheck () {
+    if (pins.analogReadPin(AnalogPin.P2) > 550 && (pins.analogReadPin(AnalogPin.P1) > 400 && pins.analogReadPin(AnalogPin.P1) < 600)) {
+        radio.sendValue("forward", pins.analogReadPin(AnalogPin.P2))
+        basic.showLeds(`
+            . . # . .
+            . # . # .
+            # . # . #
+            . . . . .
+            . . # . .
+            `)
+    } else if (pins.analogReadPin(AnalogPin.P2) < 450 && (pins.analogReadPin(AnalogPin.P1) > 400 && pins.analogReadPin(AnalogPin.P1) < 600)) {
+        radio.sendValue("backward", pins.analogReadPin(AnalogPin.P2))
+        basic.showLeds(`
+            . . # . .
+            . . . . .
+            # . # . #
+            . # . # .
+            . . # . .
+            `)
+    } else if (pins.analogReadPin(AnalogPin.P1) < 450 && (pins.analogReadPin(AnalogPin.P2) > 400 && pins.analogReadPin(AnalogPin.P2) < 600)) {
+        radio.sendValue("left", pins.analogReadPin(AnalogPin.P1))
+        basic.showLeds(`
+            . . # . .
+            . # . . .
+            # . # . #
+            . # . . .
+            . . # . .
+            `)
+    } else if (pins.analogReadPin(AnalogPin.P1) > 550 && (pins.analogReadPin(AnalogPin.P2) > 400 && pins.analogReadPin(AnalogPin.P2) < 600)) {
+        radio.sendValue("right", pins.analogReadPin(AnalogPin.P1))
+        basic.showLeds(`
+            . . # . .
+            . . . # .
+            # . # . #
+            . . . # .
+            . . # . .
+            `)
+    } else {
+        sendStop()
+    }
+}
+function incremental () {
     setVarsToPins()
-    if (forwardButton == 0) {
-        radio.sendString("slowForward")
+    if (forwardButton) {
+        radio.sendString("300")
         basic.showLeds(`
             . . # . .
             . # . # .
             # . . . #
             . . . . .
             . . . . .
-        `)
+            `)
         basic.pause(100)
-        forwardButton = 1
-    } else if (backwardButton == 0) {
-        radio.sendString("slowBackward")
-        backwardButton = 1
+        forwardButton = false
+    } else if (backwardButton) {
+        radio.sendString("400")
+        backwardButton = false
         basic.showLeds(`
             . . . . .
             . . . . .
             # . . . #
             . # . # .
             . . # . .
-        `)
+            `)
         basic.pause(100)
-    } else if (rightButton == 0) {
-        radio.sendString("oneDegreeRight")
-        rightButton = 1
+    } else if (rightButton) {
+        radio.sendString("200")
+        rightButton = false
         basic.showLeds(`
             . . # . .
             . . . # .
             . . . . #
             . . . # .
             . . # . .
-        `)
+            `)
         basic.pause(100)
-    } else if (leftButton == 0) {
-        radio.sendString("oneDegreeLeft")
-        leftButton = 1
+    } else if (leftButton) {
+        radio.sendString("100")
+        leftButton = false
         basic.showLeds(`
             . . # . .
             . # . . .
             # . . . .
             . # . . .
             . . # . .
-        `)
+            `)
         basic.pause(100)
     } else {
         sendStop()
     }
-    
 }
-
-function stickCheck() {
-    if (pins.analogReadPin(AnalogPin.P2) > 550 && (pins.analogReadPin(AnalogPin.P1) > 400 && pins.analogReadPin(AnalogPin.P1) < 600)) {
-        radio.sendValue("F", pins.analogReadPin(AnalogPin.P2))
-        basic.showLeds(`
-            . . # . .
-            . # . # .
-            # . # . #
-            . . . . .
-            . . # . .
-        `)
-    } else if (pins.analogReadPin(AnalogPin.P2) < 450 && (pins.analogReadPin(AnalogPin.P1) > 400 && pins.analogReadPin(AnalogPin.P1) < 600)) {
-        radio.sendValue("B", pins.analogReadPin(AnalogPin.P2))
-        basic.showLeds(`
-            . . # . .
-            . . . . .
-            # . # . #
-            . # . # .
-            . . # . .
-        `)
-    } else if (pins.analogReadPin(AnalogPin.P1) < 450 && (pins.analogReadPin(AnalogPin.P2) > 400 && pins.analogReadPin(AnalogPin.P2) < 600)) {
-        radio.sendValue("L", pins.analogReadPin(AnalogPin.P1))
-        basic.showLeds(`
-            . . # . .
-            . # . . .
-            # . # . #
-            . # . . .
-            . . # . .
-        `)
-    } else if (pins.analogReadPin(AnalogPin.P1) > 550 && (pins.analogReadPin(AnalogPin.P2) > 400 && pins.analogReadPin(AnalogPin.P2) < 600)) {
-        radio.sendValue("R", pins.analogReadPin(AnalogPin.P1))
-        basic.showLeds(`
-            . . # . .
-            . . . # .
-            # . # . #
-            . . . # .
-            . . # . .
-        `)
-    } else {
-        sendStop()
-    }
-    
-}
-
-function sendStop() {
+function sendStop () {
     radio.sendString("S")
 }
-
-function setVarsToPins() {
-    
-    forwardButton = pins.digitalReadPin(DigitalPin.P15)
-    backwardButton = pins.digitalReadPin(DigitalPin.P13)
-    rightButton = pins.digitalReadPin(DigitalPin.P14)
-    leftButton = pins.digitalReadPin(DigitalPin.P16)
+function setVarsToPins () {
+    if (pins.digitalReadPin(DigitalPin.P15) == 0) {
+        forwardButton = true
+    } else if (pins.digitalReadPin(DigitalPin.P13) == 0) {
+        backwardButton = true
+    } else if (pins.digitalReadPin(DigitalPin.P14) == 0) {
+        rightButton = true
+    } else if (pins.digitalReadPin(DigitalPin.P16) == 0) {
+        leftButton = true
+    }
 }
-
-function showButtons() {
+function showButtons () {
     basic.showLeds(`
         . # # # .
         # . # . #
         # # . # #
         # . # . #
         . # # # .
-    `)
+        `)
 }
-
-function setPins() {
+function setPins () {
     pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P13, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P14, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P16, PinPullMode.PullUp)
 }
-
-function loop() {
-    
+function buttonCheck () {
+    setVarsToPins()
+    if (forwardButton) {
+        radio.sendString("310")
+        forwardButton = false
+        basic.showLeds(`
+            . . # . .
+            . # # # .
+            # . # . #
+            . . # . .
+            . . # . .
+            `)
+        basic.pause(100)
+    } else if (backwardButton) {
+        radio.sendString("410")
+        backwardButton = false
+        basic.showLeds(`
+            . . # . .
+            . . # . .
+            # . # . #
+            . # # # .
+            . . # . .
+            `)
+        basic.pause(100)
+    } else if (rightButton) {
+        radio.sendString("210")
+        basic.showLeds(`
+            . . # . .
+            . . . # .
+            # # # # #
+            . . . # .
+            . . # . .
+            `)
+        basic.pause(100)
+        rightButton = false
+    } else if (leftButton) {
+        radio.sendString("" + LEFT + "10")
+        basic.showLeds(`
+            . . # . .
+            . # . . .
+            # # # # #
+            . # . . .
+            . . # . .
+            `)
+        basic.pause(100)
+        leftButton = false
+    } else {
+        sendStop()
+    }
+}
+let stickControl = false
+let leftButton = false
+let rightButton = false
+let backwardButton = false
+let forwardButton = false
+let LEFT = ""
+LEFT = "1"
+let RIGHT = "2"
+let FORWARD = "3"
+let BACKWARD = "4"
+let DAMAGE = "5"
+radio.setGroup(1)
+setPins()
+basic.forever(function () {
     if (input.buttonIsPressed(Button.A)) {
         if (stickControl) {
             stickControl = false
         } else {
             stickControl = true
         }
-        
     }
-    
     if (stickControl) {
         showStick()
         stickCheck()
     } else if (input.buttonIsPressed(Button.B)) {
         showButtons()
-        incramental()
+        incremental()
     } else {
         showButtons()
         buttonCheck()
     }
-    
-}
-
-function buttonCheck() {
-    
-    setVarsToPins()
-    if (forwardButton == 0) {
-        radio.sendString("FA")
-        forwardButton = 1
-        basic.showLeds(`
-            . . # . .
-            . # # # .
-            # . # . #
-            . . # . .
-            . . # . .
-        `)
-        basic.pause(100)
-    } else if (backwardButton == 0) {
-        radio.sendString("BA")
-        backwardButton = 1
-        basic.showLeds(`
-            . . # . .
-            . . # . .
-            # . # . #
-            . # # # .
-            . . # . .
-        `)
-        basic.pause(100)
-    } else if (rightButton == 0) {
-        radio.sendString("RA")
-        rightButton = 1
-        basic.showLeds(`
-            . . # . .
-            . . . # .
-            # # # # #
-            . . . # .
-            . . # . .
-        `)
-        basic.pause(100)
-    } else if (leftButton == 0) {
-        radio.sendString("LA")
-        leftButton = 1
-        basic.showLeds(`
-            . . # . .
-            . # . . .
-            # # # # #
-            . # . . .
-            . . # . .
-        `)
-        basic.pause(100)
-    } else {
-        sendStop()
-    }
-    
-}
-
-let leftButton = 0
-let rightButton = 0
-let backwardButton = 0
-let forwardButton = 0
-let stickControl = false
-radio.setGroup(1)
-stickControl = false
-setPins()
-basic.forever(function on_forever() {
-    loop()
 })
