@@ -6,11 +6,26 @@ def showStick():
         . . # . .
         . . # . .
     """)
-def incramental():
+def setPins():
+    pins.set_pull(DigitalPin.P15, PinPullMode.PULL_UP)
+    pins.set_pull(DigitalPin.P13, PinPullMode.PULL_UP)
+    pins.set_pull(DigitalPin.P14, PinPullMode.PULL_UP)
+    pins.set_pull(DigitalPin.P16, PinPullMode.PULL_UP)
+def setVarsToPins():
+    global forwardButton, backwardButton, rightButton, leftButton
+    if pins.digital_read_pin(DigitalPin.P15) == 0:
+        forwardButton = True
+    elif pins.digital_read_pin(DigitalPin.P13) == 0:
+        backwardButton = True
+    elif pins.digital_read_pin(DigitalPin.P14) == 0:
+        rightButton = True
+    elif pins.digital_read_pin(DigitalPin.P16) == 0:
+        leftButton = True
+def incremental():
     global forwardButton, backwardButton, rightButton, leftButton
     setVarsToPins()
-    if forwardButton == 0:
-        radio.send_string("littleForward")
+    if forwardButton:
+        radio.send_string("300")
         basic.show_leds("""
             . . # . .
             . # . # .
@@ -19,10 +34,10 @@ def incramental():
             . . . . .
         """)
         basic.pause(100)
-        forwardButton = 1
-    elif backwardButton == 0:
-        radio.send_string("littleBackward")
-        backwardButton = 1
+        forwardButton = False
+    elif backwardButton:
+        radio.send_string("400")
+        backwardButton = False
         basic.show_leds("""
             . . . . .
             . . . . .
@@ -31,9 +46,9 @@ def incramental():
             . . # . .
         """)
         basic.pause(100)
-    elif rightButton == 0:
-        radio.send_string("littleRight")
-        rightButton = 1
+    elif rightButton:
+        radio.send_string("200")
+        rightButton = False
         basic.show_leds("""
             . . # . .
             . . . # .
@@ -42,9 +57,9 @@ def incramental():
             . . # . .
         """)
         basic.pause(100)
-    elif leftButton == 0:
-        radio.send_string("littleLeft")
-        leftButton = 1
+    elif leftButton:
+        radio.send_string("100")
+        leftButton = False
         basic.show_leds("""
             . . # . .
             . # . . .
@@ -96,12 +111,7 @@ def stickCheck():
         sendStop()
 def sendStop():
     radio.send_string("S")
-def setVarsToPins():
-    global forwardButton, backwardButton, rightButton, leftButton
-    forwardButton = pins.digital_read_pin(DigitalPin.P15)
-    backwardButton = pins.digital_read_pin(DigitalPin.P13)
-    rightButton = pins.digital_read_pin(DigitalPin.P14)
-    leftButton = pins.digital_read_pin(DigitalPin.P16)
+
 def showButtons():
     basic.show_leds("""
         . # # # .
@@ -110,12 +120,72 @@ def showButtons():
         # . # . #
         . # # # .
     """)
-def setPins():
-    pins.set_pull(DigitalPin.P15, PinPullMode.PULL_UP)
-    pins.set_pull(DigitalPin.P13, PinPullMode.PULL_UP)
-    pins.set_pull(DigitalPin.P14, PinPullMode.PULL_UP)
-    pins.set_pull(DigitalPin.P16, PinPullMode.PULL_UP)
-def loop():
+
+def buttonCheck():
+    global forwardButton, backwardButton, rightButton, leftButton
+    setVarsToPins()
+    if forwardButton:
+        radio.send_string("310")
+        forwardButton = False
+        basic.show_leds("""
+            . . # . .
+            . # # # .
+            # . # . #
+            . . # . .
+            . . # . .
+        """)
+        basic.pause(100)
+    elif backwardButton:
+        radio.send_string("410")
+        backwardButton = False
+        basic.show_leds("""
+            . . # . .
+            . . # . .
+            # . # . #
+            . # # # .
+            . . # . .
+        """)
+        basic.pause(100)
+    elif rightButton:
+        radio.send_string("210")
+        basic.show_leds("""
+            . . # . .
+            . . . # .
+            # # # # #
+            . . . # .
+            . . # . .
+        """)
+        basic.pause(100)
+        rightButton = False
+    elif leftButton:
+        radio.send_string(LEFT+"10")
+        
+        basic.show_leds("""
+            . . # . .
+            . # . . .
+            # # # # #
+            . # . . .
+            . . # . .
+        """)
+        basic.pause(100)
+        leftButton = False
+    else:
+        sendStop()
+
+leftButton = False
+rightButton = False
+backwardButton = False
+forwardButton = False
+stickControl = False
+LEFT = "1"
+RIGHT = "2"
+FORWARD = "3"
+BACKWARD = "4"
+DAMAGE = "5"
+radio.set_group(1)
+setPins()
+
+def on_forever():
     global stickControl
     if input.button_is_pressed(Button.A):
         if stickControl:
@@ -127,68 +197,8 @@ def loop():
         stickCheck()
     elif input.button_is_pressed(Button.B):
         showButtons()
-        incramental()
+        incremental()
     else:
         showButtons()
         buttonCheck()
-def buttonCheck():
-    global forwardButton, backwardButton, rightButton, leftButton
-    setVarsToPins()
-    if forwardButton == 0:
-        radio.send_string("oneForward")
-        forwardButton = 1
-        basic.show_leds("""
-            . . # . .
-            . # # # .
-            # . # . #
-            . . # . .
-            . . # . .
-        """)
-        basic.pause(100)
-    elif backwardButton == 0:
-        radio.send_string("oneBackward")
-        backwardButton = 1
-        basic.show_leds("""
-            . . # . .
-            . . # . .
-            # . # . #
-            . # # # .
-            . . # . .
-        """)
-        basic.pause(100)
-    elif rightButton == 0:
-        radio.send_string("oneRight")
-        rightButton = 1
-        basic.show_leds("""
-            . . # . .
-            . . . # .
-            # # # # #
-            . . . # .
-            . . # . .
-        """)
-        basic.pause(100)
-    elif leftButton == 0:
-        radio.send_string("oneLeft")
-        leftButton = 1
-        basic.show_leds("""
-            . . # . .
-            . # . . .
-            # # # # #
-            . # . . .
-            . . # . .
-        """)
-        basic.pause(100)
-    else:
-        sendStop()
-leftButton = 0
-rightButton = 0
-backwardButton = 0
-forwardButton = 0
-stickControl = False
-radio.set_group(1)
-stickControl = False
-setPins()
-
-def on_forever():
-    loop()
 basic.forever(on_forever)
