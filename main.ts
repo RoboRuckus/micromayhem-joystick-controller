@@ -7,6 +7,25 @@ function showStick () {
         . . # . .
         `)
 }
+function setBTGroup () {
+    basic.showString("SET CHANNEL")
+    soundExpression.giggle.playUntilDone()
+    done = 0
+    btgroupnum = 0
+    while (done == 0) {
+        if (input.buttonIsPressed(Button.B)) {
+            music.playTone(131, music.beat(BeatFraction.Sixteenth))
+            btgroupnum += 1
+        }
+        if (input.buttonIsPressed(Button.A)) {
+            soundExpression.spring.playUntilDone()
+            done = 1
+        }
+        basic.showNumber(btgroupnum)
+    }
+    radio.setGroup(btgroupnum)
+    basic.showIcon(IconNames.Yes)
+}
 function stickCheck () {
     if (pins.analogReadPin(AnalogPin.P2) > 550 && (pins.analogReadPin(AnalogPin.P1) > 400 && pins.analogReadPin(AnalogPin.P1) < 600)) {
         radio.sendValue("forward", pins.analogReadPin(AnalogPin.P2))
@@ -182,6 +201,8 @@ let leftButton = false
 let rightButton = false
 let backwardButton = false
 let forwardButton = false
+let btgroupnum = 0
+let done = 0
 let LEFT = ""
 LEFT = "1"
 let RIGHT = "2"
@@ -190,6 +211,7 @@ let BACKWARD = "4"
 let DAMAGE = "5"
 radio.setGroup(1)
 setPins()
+setBTGroup()
 basic.forever(function () {
     if (input.buttonIsPressed(Button.A)) {
         if (stickControl) {
