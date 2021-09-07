@@ -121,14 +121,14 @@ function sendStop () {
     radio.sendString("S")
 }
 function setVarsToPins () {
-    if (pins.digitalReadPin(DigitalPin.P15) == 0) {
+    if (pins.digitalReadPin(DigitalPin.P13) == 0) {
         forwardButton = true
-    } else if (pins.digitalReadPin(DigitalPin.P13) == 0) {
-        backwardButton = true
-    } else if (pins.digitalReadPin(DigitalPin.P14) == 0) {
-        rightButton = true
-    } else if (pins.digitalReadPin(DigitalPin.P16) == 0) {
+    } else if (pins.digitalReadPin(DigitalPin.P12) == 0) {
         leftButton = true
+    } else if (pins.digitalReadPin(DigitalPin.P14) == 0) {
+        backwardButton = true
+    } else if (pins.digitalReadPin(DigitalPin.P15) == 0) {
+        rightButton = true
     }
 }
 function showButtons () {
@@ -141,10 +141,10 @@ function showButtons () {
         `)
 }
 function setPins () {
-    pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
+    pins.setPull(DigitalPin.P12, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P13, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P14, PinPullMode.PullUp)
-    pins.setPull(DigitalPin.P16, PinPullMode.PullUp)
+    pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
 }
 function buttonCheck () {
     setVarsToPins()

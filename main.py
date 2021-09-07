@@ -1,3 +1,11 @@
+def showStick():
+    basic.show_leds("""
+        . # # # .
+                # # # # #
+                . # # # .
+                . . # . .
+                . . # . .
+    """)
 def setBTGroup():
     global done, btgroupnum
     basic.show_string("SET CHANNEL")
@@ -14,14 +22,6 @@ def setBTGroup():
         basic.show_number(btgroupnum)
     radio.set_group(btgroupnum)
     basic.show_icon(IconNames.YES)
-def showStick():
-    basic.show_leds("""
-        . # # # .
-                # # # # #
-                . # # # .
-                . . # . .
-                . . # . .
-    """)
 def stickCheck():
     if pins.analog_read_pin(AnalogPin.P2) > 550 and (pins.analog_read_pin(AnalogPin.P1) > 400 and pins.analog_read_pin(AnalogPin.P1) < 600):
         radio.send_value("forward", pins.analog_read_pin(AnalogPin.P2))
@@ -114,14 +114,14 @@ def sendStop():
     radio.send_string("S")
 def setVarsToPins():
     global forwardButton, backwardButton, rightButton, leftButton
-    if pins.digital_read_pin(DigitalPin.P15) == 0:
+    if pins.digital_read_pin(DigitalPin.P13) == 0:
         forwardButton = True
-    elif pins.digital_read_pin(DigitalPin.P13) == 0:
-        backwardButton = True
-    elif pins.digital_read_pin(DigitalPin.P14) == 0:
-        rightButton = True
-    elif pins.digital_read_pin(DigitalPin.P16) == 0:
+    elif pins.digital_read_pin(DigitalPin.P12) == 0:
         leftButton = True
+    elif pins.digital_read_pin(DigitalPin.P14) == 0:
+        backwardButton = True
+    elif pins.digital_read_pin(DigitalPin.P15) == 0:
+        rightButton = True
 def showButtons():
     basic.show_leds("""
         . # # # .
@@ -131,10 +131,10 @@ def showButtons():
                 . # # # .
     """)
 def setPins():
-    pins.set_pull(DigitalPin.P15, PinPullMode.PULL_UP)
+    pins.set_pull(DigitalPin.P12, PinPullMode.PULL_UP)
     pins.set_pull(DigitalPin.P13, PinPullMode.PULL_UP)
     pins.set_pull(DigitalPin.P14, PinPullMode.PULL_UP)
-    pins.set_pull(DigitalPin.P16, PinPullMode.PULL_UP)
+    pins.set_pull(DigitalPin.P15, PinPullMode.PULL_UP)
 def buttonCheck():
     global forwardButton, backwardButton, rightButton, leftButton
     setVarsToPins()
@@ -184,13 +184,13 @@ def buttonCheck():
         leftButton = False
     else:
         sendStop()
-btgroupnum = 0
-done = 0
 stickControl = False
 leftButton = False
 rightButton = False
 backwardButton = False
 forwardButton = False
+btgroupnum = 0
+done = 0
 LEFT = ""
 LEFT = "1"
 RIGHT = "2"
@@ -199,6 +199,7 @@ BACKWARD = "4"
 DAMAGE = "5"
 radio.set_group(1)
 setPins()
+setBTGroup()
 
 def on_forever():
     global stickControl
