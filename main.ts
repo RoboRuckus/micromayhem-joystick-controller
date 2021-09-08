@@ -7,6 +7,20 @@ function showStick () {
         . . # . .
         `)
 }
+function multiple (maximumAmount: number) {
+    for (let index = 0; index <= maximumAmount; index++) {
+        setVarsToPins()
+        if (direction == "empty") {
+            continue;
+        } else if (direction == currentButton) {
+            amount += 1
+        } else if (amount > maximumAmount) {
+            amount = 0
+        }
+        Arrow()
+        basic.pause(500)
+    }
+}
 function setBTGroup () {
     basic.showString("SET CHANNEL")
     soundExpression.giggle.playUntilDone()
@@ -69,7 +83,7 @@ function stickCheck () {
 }
 function incremental () {
     setVarsToPins()
-    if (forwardButton) {
+    if (direction == FORWARD) {
         radio.sendString("300")
         basic.showLeds(`
             . . # . .
@@ -79,10 +93,8 @@ function incremental () {
             . . . . .
             `)
         basic.pause(100)
-        forwardButton = false
-    } else if (backwardButton) {
+    } else if (direction == BACKWARD) {
         radio.sendString("400")
-        backwardButton = false
         basic.showLeds(`
             . . . . .
             . . . . .
@@ -91,9 +103,8 @@ function incremental () {
             . . # . .
             `)
         basic.pause(100)
-    } else if (rightButton) {
+    } else if (direction == RIGHT) {
         radio.sendString("200")
-        rightButton = false
         basic.showLeds(`
             . . # . .
             . . . # .
@@ -102,9 +113,8 @@ function incremental () {
             . . # . .
             `)
         basic.pause(100)
-    } else if (leftButton) {
+    } else if (direction == LEFT) {
         radio.sendString("100")
-        leftButton = false
         basic.showLeds(`
             . . # . .
             . # . . .
@@ -116,19 +126,22 @@ function incremental () {
     } else {
         sendStop()
     }
+    direction = "empty"
 }
 function sendStop () {
     radio.sendString("S")
 }
 function setVarsToPins () {
-    if (pins.digitalReadPin(DigitalPin.P13) == 0) {
-        forwardButton = true
-    } else if (pins.digitalReadPin(DigitalPin.P12) == 0) {
-        leftButton = true
+    if (pins.digitalReadPin(DigitalPin.P16) == 0) {
+        direction = LEFT
+    } else if (pins.digitalReadPin(DigitalPin.P13) == 0) {
+        direction = BACKWARD
     } else if (pins.digitalReadPin(DigitalPin.P14) == 0) {
-        backwardButton = true
+        direction = RIGHT
     } else if (pins.digitalReadPin(DigitalPin.P15) == 0) {
-        rightButton = true
+        direction = FORWARD
+    } else {
+        direction = "empty"
     }
 }
 function showButtons () {
@@ -141,27 +154,22 @@ function showButtons () {
         `)
 }
 function setPins () {
-    pins.setPull(DigitalPin.P12, PinPullMode.PullUp)
+    pins.setPull(DigitalPin.P16, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P13, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P14, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
 }
 function buttonCheck () {
     setVarsToPins()
-    if (forwardButton) {
-        radio.sendString("310")
-        forwardButton = false
-        basic.showLeds(`
-            . . # . .
-            . # # # .
-            # . # . #
-            . . # . .
-            . . # . .
-            `)
+    currentButton = direction
+    if (direction == FORWARD) {
+        multiple(3)
         basic.pause(100)
-    } else if (backwardButton) {
-        radio.sendString("410")
-        backwardButton = false
+        if (amount != 0) {
+            radio.sendString("" + FORWARD + ("" + amount + "0"))
+        }
+    } else if (direction == BACKWARD) {
+        radio.sendString("" + BACKWARD + "10")
         basic.showLeds(`
             . . # . .
             . . # . .
@@ -170,8 +178,8 @@ function buttonCheck () {
             . . # . .
             `)
         basic.pause(100)
-    } else if (rightButton) {
-        radio.sendString("210")
+    } else if (direction == RIGHT) {
+        radio.sendString("" + RIGHT + "10")
         basic.showLeds(`
             . . # . .
             . . . # .
@@ -180,8 +188,7 @@ function buttonCheck () {
             . . # . .
             `)
         basic.pause(100)
-        rightButton = false
-    } else if (leftButton) {
+    } else if (direction == LEFT) {
         radio.sendString("" + LEFT + "10")
         basic.showLeds(`
             . . # . .
@@ -191,24 +198,63 @@ function buttonCheck () {
             . . # . .
             `)
         basic.pause(100)
-        leftButton = false
     } else {
         sendStop()
     }
+    direction = "empty"
+    amount = 0
+}
+function Arrow () {
+    if (amount == 1) {
+        basic.showLeds(`
+            . . # . .
+            . # . # .
+            # . . . #
+            . . . . .
+            . . . . .
+            `)
+    } else if (amount == 2) {
+        basic.showLeds(`
+            . . # . .
+            . # . # .
+            # . # . #
+            . # . # .
+            # . . . #
+            `)
+    } else if (amount == 3) {
+        basic.showLeds(`
+            . . # . .
+            . # # # .
+            # # # # #
+            # # . # #
+            # . . . #
+            `)
+    } else {
+        basic.showLeds(`
+            . # # # .
+            # . . . #
+            # . . . #
+            # . . . #
+            . # # # .
+            `)
+    }
 }
 let stickControl = false
-let leftButton = false
-let rightButton = false
-let backwardButton = false
-let forwardButton = false
 let btgroupnum = 0
 let done = 0
+let amount = 0
+let currentButton = ""
+let direction = ""
+let BACKWARD = ""
+let FORWARD = ""
+let RIGHT = ""
 let LEFT = ""
 LEFT = "1"
-let RIGHT = "2"
-let FORWARD = "3"
-let BACKWARD = "4"
+RIGHT = "2"
+FORWARD = "3"
+BACKWARD = "4"
 let DAMAGE = "5"
+direction = "empty"
 radio.setGroup(1)
 setPins()
 setBTGroup()
