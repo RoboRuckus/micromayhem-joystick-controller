@@ -12,12 +12,24 @@ function multiple (maximumAmount: number) {
         setVarsToPins()
         if (direction == "empty") {
             continue;
+        } else if (amount == maximumAmount) {
+            amount = 0
+            basic.showLeds(`
+                . # # # .
+                # . . . #
+                # . . . #
+                # . . . #
+                . # # # .
+                `)
+            continue;
         } else if (direction == currentButton) {
             amount += 1
-        } else if (amount > maximumAmount) {
-            amount = 0
         }
-        Arrow()
+        if (direction == FORWARD) {
+            forward_arrow()
+        } else {
+            display_left_right_arrow()
+        }
         basic.pause(500)
     }
 }
@@ -159,52 +171,7 @@ function setPins () {
     pins.setPull(DigitalPin.P14, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
 }
-function buttonCheck () {
-    setVarsToPins()
-    currentButton = direction
-    if (direction == FORWARD) {
-        multiple(3)
-        basic.pause(100)
-        if (amount != 0) {
-            radio.sendString("" + FORWARD + ("" + amount + "0"))
-        }
-    } else if (direction == BACKWARD) {
-        radio.sendString("" + BACKWARD + "10")
-        basic.showLeds(`
-            . . # . .
-            . . # . .
-            # . # . #
-            . # # # .
-            . . # . .
-            `)
-        basic.pause(100)
-    } else if (direction == RIGHT) {
-        radio.sendString("" + RIGHT + "10")
-        basic.showLeds(`
-            . . # . .
-            . . . # .
-            # # # # #
-            . . . # .
-            . . # . .
-            `)
-        basic.pause(100)
-    } else if (direction == LEFT) {
-        radio.sendString("" + LEFT + "10")
-        basic.showLeds(`
-            . . # . .
-            . # . . .
-            # # # # #
-            . # . . .
-            . . # . .
-            `)
-        basic.pause(100)
-    } else {
-        sendStop()
-    }
-    direction = "empty"
-    amount = 0
-}
-function Arrow () {
+function forward_arrow () {
     if (amount == 1) {
         basic.showLeds(`
             . . # . .
@@ -229,21 +196,77 @@ function Arrow () {
             # # . # #
             # . . . #
             `)
+    }
+}
+function buttonCheck () {
+    setVarsToPins()
+    currentButton = direction
+    if (direction == FORWARD) {
+        multiple(3)
+        basic.pause(100)
+        if (amount != 0) {
+            radio.sendString("" + FORWARD + ("" + amount + "0"))
+        }
+    } else if (direction == BACKWARD) {
+        radio.sendString("" + BACKWARD + "10")
+        basic.showLeds(`
+            . . # . .
+            . . # . .
+            # . # . #
+            . # # # .
+            . . # . .
+            `)
+        basic.pause(100)
+    } else if (direction == RIGHT) {
+        multiple(2)
+        basic.pause(100)
+        if (amount != 0) {
+            radio.sendString("" + RIGHT + ("" + amount + "0"))
+        }
+    } else if (direction == LEFT) {
+        multiple(2)
+        if (amount != 0) {
+            radio.sendString("" + LEFT + ("" + amount + "0"))
+        }
+        basic.pause(100)
     } else {
+        sendStop()
+    }
+    direction = "empty"
+    amount = 0
+}
+function display_left_right_arrow () {
+    if (amount == 2) {
         basic.showLeds(`
             . # # # .
             # . . . #
+            # . # . #
+            # . . # #
             # . . . #
-            # . . . #
-            . # # # .
+            `)
+    } else if (direction == LEFT) {
+        basic.showLeds(`
+            . . # . .
+            . # . . .
+            # # # # #
+            . # . . .
+            . . # . .
+            `)
+    } else if (direction == RIGHT) {
+        basic.showLeds(`
+            . . # . .
+            . . . # .
+            # # # # #
+            . . . # .
+            . . # . .
             `)
     }
 }
 let stickControl = false
 let btgroupnum = 0
 let done = 0
-let amount = 0
 let currentButton = ""
+let amount = 0
 let direction = ""
 let BACKWARD = ""
 let FORWARD = ""
