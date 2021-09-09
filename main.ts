@@ -7,6 +7,40 @@ function showStick () {
         . . # . .
         `)
 }
+function multiple (maximumAmount: number) {
+    for (let index = 0; index <= maximumAmount; index++) {
+        setVarsToPins()
+        if (direction == "empty") {
+            continue;
+        } else if (amount == maximumAmount) {
+            amount = 0
+            basic.showLeds(`
+                . # # # .
+                # . . . #
+                # . . . #
+                # . . . #
+                . # # # .
+                `)
+            continue;
+        } else if (direction == currentButton) {
+            amount += 1
+        }
+        if (direction == FORWARD) {
+            forward_arrow()
+        } else if (direction == BACKWARD) {
+            basic.showLeds(`
+                . . # . .
+                . . # . .
+                # . # . #
+                . # # # .
+                . . # . .
+                `)
+        } else {
+            display_left_right_arrow()
+        }
+        basic.pause(500)
+    }
+}
 function setBTGroup () {
     basic.showString("SET CHANNEL")
     soundExpression.giggle.playUntilDone()
@@ -69,7 +103,7 @@ function stickCheck () {
 }
 function incremental () {
     setVarsToPins()
-    if (forwardButton) {
+    if (direction == FORWARD) {
         radio.sendString("300")
         basic.showLeds(`
             . . # . .
@@ -79,10 +113,8 @@ function incremental () {
             . . . . .
             `)
         basic.pause(100)
-        forwardButton = false
-    } else if (backwardButton) {
+    } else if (direction == BACKWARD) {
         radio.sendString("400")
-        backwardButton = false
         basic.showLeds(`
             . . . . .
             . . . . .
@@ -91,9 +123,8 @@ function incremental () {
             . . # . .
             `)
         basic.pause(100)
-    } else if (rightButton) {
+    } else if (direction == RIGHT) {
         radio.sendString("200")
-        rightButton = false
         basic.showLeds(`
             . . # . .
             . . . # .
@@ -102,9 +133,8 @@ function incremental () {
             . . # . .
             `)
         basic.pause(100)
-    } else if (leftButton) {
+    } else if (direction == LEFT) {
         radio.sendString("100")
-        leftButton = false
         basic.showLeds(`
             . . # . .
             . # . . .
@@ -116,19 +146,22 @@ function incremental () {
     } else {
         sendStop()
     }
+    direction = "empty"
 }
 function sendStop () {
     radio.sendString("S")
 }
 function setVarsToPins () {
-    if (pins.digitalReadPin(DigitalPin.P13) == 0) {
-        forwardButton = true
-    } else if (pins.digitalReadPin(DigitalPin.P12) == 0) {
-        leftButton = true
+    if (pins.digitalReadPin(DigitalPin.P12) == 0) {
+        direction = LEFT
     } else if (pins.digitalReadPin(DigitalPin.P14) == 0) {
-        backwardButton = true
+        direction = BACKWARD
     } else if (pins.digitalReadPin(DigitalPin.P15) == 0) {
-        rightButton = true
+        direction = RIGHT
+    } else if (pins.digitalReadPin(DigitalPin.P13) == 0) {
+        direction = FORWARD
+    } else {
+        direction = "empty"
     }
 }
 function showButtons () {
@@ -146,69 +179,105 @@ function setPins () {
     pins.setPull(DigitalPin.P14, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
 }
+function forward_arrow () {
+    if (amount == 1) {
+        basic.showLeds(`
+            . . # . .
+            . # . # .
+            # . . . #
+            . . . . .
+            . . . . .
+            `)
+    } else if (amount == 2) {
+        basic.showLeds(`
+            . . # . .
+            . # . # .
+            # . # . #
+            . # . # .
+            # . . . #
+            `)
+    } else if (amount == 3) {
+        basic.showLeds(`
+            . . # . .
+            . # # # .
+            # # # # #
+            # # . # #
+            # . . . #
+            `)
+    }
+}
 function buttonCheck () {
     setVarsToPins()
-    if (forwardButton) {
-        radio.sendString("310")
-        forwardButton = false
-        basic.showLeds(`
-            . . # . .
-            . # # # .
-            # . # . #
-            . . # . .
-            . . # . .
-            `)
-        basic.pause(100)
-    } else if (backwardButton) {
-        radio.sendString("410")
-        backwardButton = false
-        basic.showLeds(`
-            . . # . .
-            . . # . .
-            # . # . #
-            . # # # .
-            . . # . .
-            `)
-        basic.pause(100)
-    } else if (rightButton) {
-        radio.sendString("210")
-        basic.showLeds(`
-            . . # . .
-            . . . # .
-            # # # # #
-            . . . # .
-            . . # . .
-            `)
-        basic.pause(100)
-        rightButton = false
-    } else if (leftButton) {
-        radio.sendString("" + LEFT + "10")
-        basic.showLeds(`
-            . . # . .
-            . # . . .
-            # # # # #
-            . # . . .
-            . . # . .
-            `)
-        basic.pause(100)
-        leftButton = false
+    currentButton = direction
+    if (direction == FORWARD) {
+        multiple(3)
+        if (amount != 0) {
+            radio.sendString("" + FORWARD + ("" + amount + "0"))
+        }
+    } else if (direction == BACKWARD) {
+        multiple(1)
+        if (amount != 0) {
+            radio.sendString("" + BACKWARD + ("" + amount + "0"))
+        }
+    } else if (direction == RIGHT) {
+        multiple(2)
+        if (amount != 0) {
+            radio.sendString("" + RIGHT + ("" + amount + "0"))
+        }
+    } else if (direction == LEFT) {
+        multiple(2)
+        if (amount != 0) {
+            radio.sendString("" + LEFT + ("" + amount + "0"))
+        }
     } else {
         sendStop()
     }
+    direction = "empty"
+    amount = 0
+}
+function display_left_right_arrow () {
+    if (amount == 2) {
+        basic.showLeds(`
+            . # # # .
+            # . . . #
+            # . # . #
+            # . . # #
+            # . . . #
+            `)
+    } else if (direction == LEFT) {
+        basic.showLeds(`
+            . . # . .
+            . # . . .
+            # # # # #
+            . # . . .
+            . . # . .
+            `)
+    } else if (direction == RIGHT) {
+        basic.showLeds(`
+            . . # . .
+            . . . # .
+            # # # # #
+            . . . # .
+            . . # . .
+            `)
+    }
 }
 let stickControl = false
-let leftButton = false
-let rightButton = false
-let backwardButton = false
-let forwardButton = false
 let btgroupnum = 0
 let done = 0
+let currentButton = ""
+let amount = 0
+let direction = ""
+let BACKWARD = ""
+let FORWARD = ""
+let RIGHT = ""
 let LEFT = ""
 LEFT = "1"
-let RIGHT = "2"
-let FORWARD = "3"
-let BACKWARD = "4"
+RIGHT = "2"
+FORWARD = "3"
+BACKWARD = "4"
 let DAMAGE = "5"
+direction = "empty"
 radio.setGroup(1)
 setPins()
 setBTGroup()
