@@ -27,6 +27,14 @@ function multiple (maximumAmount: number) {
         }
         if (direction == FORWARD) {
             forward_arrow()
+        } else if (direction == BACKWARD) {
+            basic.showLeds(`
+                . . # . .
+                . . # . .
+                # . # . #
+                . # # # .
+                . . # . .
+                `)
         } else {
             display_left_right_arrow()
         }
@@ -144,13 +152,13 @@ function sendStop () {
     radio.sendString("S")
 }
 function setVarsToPins () {
-    if (pins.digitalReadPin(DigitalPin.P16) == 0) {
+    if (pins.digitalReadPin(DigitalPin.P12) == 0) {
         direction = LEFT
-    } else if (pins.digitalReadPin(DigitalPin.P13) == 0) {
-        direction = BACKWARD
     } else if (pins.digitalReadPin(DigitalPin.P14) == 0) {
-        direction = RIGHT
+        direction = BACKWARD
     } else if (pins.digitalReadPin(DigitalPin.P15) == 0) {
+        direction = RIGHT
+    } else if (pins.digitalReadPin(DigitalPin.P13) == 0) {
         direction = FORWARD
     } else {
         direction = "empty"
@@ -166,7 +174,7 @@ function showButtons () {
         `)
 }
 function setPins () {
-    pins.setPull(DigitalPin.P16, PinPullMode.PullUp)
+    pins.setPull(DigitalPin.P12, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P13, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P14, PinPullMode.PullUp)
     pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
@@ -203,23 +211,16 @@ function buttonCheck () {
     currentButton = direction
     if (direction == FORWARD) {
         multiple(3)
-        basic.pause(100)
         if (amount != 0) {
             radio.sendString("" + FORWARD + ("" + amount + "0"))
         }
     } else if (direction == BACKWARD) {
-        radio.sendString("" + BACKWARD + "10")
-        basic.showLeds(`
-            . . # . .
-            . . # . .
-            # . # . #
-            . # # # .
-            . . # . .
-            `)
-        basic.pause(100)
+        multiple(1)
+        if (amount != 0) {
+            radio.sendString("" + BACKWARD + ("" + amount + "0"))
+        }
     } else if (direction == RIGHT) {
         multiple(2)
-        basic.pause(100)
         if (amount != 0) {
             radio.sendString("" + RIGHT + ("" + amount + "0"))
         }
@@ -228,7 +229,6 @@ function buttonCheck () {
         if (amount != 0) {
             radio.sendString("" + LEFT + ("" + amount + "0"))
         }
-        basic.pause(100)
     } else {
         sendStop()
     }
